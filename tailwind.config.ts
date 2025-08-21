@@ -18,7 +18,22 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+			},
 			colors: {
+				'cyber': {
+					'bg': 'hsl(var(--cyber-bg))',
+					'surface': 'hsl(var(--cyber-surface))',
+					'surface-hover': 'hsl(var(--cyber-surface-hover))',
+					'border': 'hsl(var(--cyber-border))',
+					'border-bright': 'hsl(var(--cyber-border-bright))',
+					'text': 'hsl(var(--cyber-text))',
+					'text-dim': 'hsl(var(--cyber-text-dim))',
+					'glow': 'hsl(var(--cyber-glow))',
+					'glow-secondary': 'hsl(var(--cyber-glow-secondary))',
+					'accent': 'hsl(var(--cyber-accent))',
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -84,12 +99,28 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				'pulse-glow': {
+					'0%, 100%': {
+						boxShadow: '0 0 20px hsl(180 100% 50% / 0.3)',
+						transform: 'scale(1)',
+					},
+					'50%': {
+						boxShadow: '0 0 40px hsl(180 100% 50% / 0.6)',
+						transform: 'scale(1.02)',
+					},
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0px)' },
+					'50%': { transform: 'translateY(-10px)' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'float': 'float 3s ease-in-out infinite',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
