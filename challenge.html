@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Challenge</title>
+    <meta name="description" content="Cyber Security Challenge" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: 220 13% 9%;
+            --foreground: 180 100% 90%;
+            --cyber-bg: 220 13% 9%;
+            --cyber-surface: 220 13% 12%;
+            --cyber-surface-hover: 220 13% 16%;
+            --cyber-border: 220 13% 20%;
+            --cyber-border-bright: 180 100% 30%;
+            --cyber-text: 180 100% 90%;
+            --cyber-text-dim: 180 10% 60%;
+            --cyber-glow: 180 100% 50%;
+            --cyber-glow-secondary: 160 84% 39%;
+            --cyber-accent: 280 100% 70%;
+            --gradient-cyber: linear-gradient(135deg, hsl(180 100% 30%), hsl(160 84% 39%));
+            --shadow-cyber: 0 0 20px hsl(180 100% 50% / 0.3);
+            --shadow-cyber-lg: 0 0 40px hsl(180 100% 50% / 0.4);
+            --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 400;
+            min-height: 100vh;
+        }
+
+        .cyber-grid {
+            background-image: 
+                linear-gradient(hsl(var(--cyber-border)) 1px, transparent 1px),
+                linear-gradient(90deg, hsl(var(--cyber-border)) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .challenge-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .challenge-id {
+            font-size: 2rem;
+            font-weight: 700;
+            color: hsl(var(--cyber-glow));
+        }
+
+        .challenge-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: hsl(var(--cyber-text));
+        }
+
+        .back-button {
+            background: hsl(var(--cyber-surface));
+            border: 1px solid hsl(var(--cyber-border));
+            border-radius: 8px;
+            color: hsl(var(--cyber-text));
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: var(--transition-cyber);
+            box-shadow: var(--shadow-cyber);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: hsl(var(--cyber-surface-hover));
+            box-shadow: var(--shadow-cyber-lg);
+        }
+
+        .back-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .challenge-content {
+            display: grid;
+            gap: 24px;
+        }
+
+        .challenge-card {
+            background: hsl(var(--cyber-surface) / 0.8);
+            border: 1px solid hsl(var(--cyber-border));
+            border-radius: 8px;
+            padding: 24px;
+            position: relative;
+        }
+
+        .challenge-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: var(--gradient-cyber);
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .challenge-card:hover::before {
+            opacity: 0.3;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: hsl(var(--cyber-glow));
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .card-content {
+            color: hsl(var(--cyber-text));
+            line-height: 1.6;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .difficulty-easy {
+            background: hsl(var(--cyber-glow-secondary) / 0.2);
+            color: hsl(var(--cyber-glow-secondary));
+            border: 1px solid hsl(var(--cyber-glow-secondary));
+        }
+
+        .difficulty-medium {
+            background: hsl(var(--cyber-glow) / 0.2);
+            color: hsl(var(--cyber-glow));
+            border: 1px solid hsl(var(--cyber-glow));
+        }
+
+        .difficulty-hard {
+            background: hsl(var(--cyber-accent) / 0.2);
+            color: hsl(var(--cyber-accent));
+            border: 1px solid hsl(var(--cyber-accent));
+        }
+
+        .hint-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .hint-list li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .hint-list li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: hsl(var(--cyber-glow));
+            font-size: 0.8rem;
+        }
+
+        .terminal-output {
+            background: hsl(var(--cyber-bg));
+            border: 1px solid hsl(var(--cyber-border-bright));
+            border-radius: 4px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: hsl(var(--cyber-glow));
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+
+        .terminal-prompt {
+            color: hsl(var(--cyber-glow-secondary));
+        }
+    </style>
+</head>
+<body class="cyber-grid">
+    <div class="container">
+        <div class="header">
+            <div class="challenge-title">
+                <span class="challenge-id" id="challengeId">D1</span>
+                <span class="challenge-name" id="challengeName">Loading...</span>
+            </div>
+            <a href="index.html" class="back-button">
+                <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m12 19-7-7 7-7"></path>
+                    <path d="m19 12H5"></path>
+                </svg>
+                Back to Grid
+            </a>
+        </div>
+
+        <div class="challenge-content" id="challengeContent">
+            <!-- Content will be loaded by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const challengeData = {
+            D1: {
+                name: "Network Reconnaissance",
+                difficulty: "easy",
+                objective: "Perform network scanning to identify open ports and services on the target system.",
+                description: "This challenge focuses on network discovery and port scanning techniques. You'll need to identify running services and potential entry points.",
+                hints: [
+                    "Use nmap to scan for open ports",
+                    "Look for common service ports (22, 80, 443, etc.)",
+                    "Pay attention to service versions"
+                ],
+                terminal: "$ nmap -sV target.ctf.local\nStarting Nmap scan...\nPORT     STATE SERVICE VERSION\n22/tcp   open  ssh     OpenSSH 8.9\n80/tcp   open  http    Apache 2.4.52"
+            },
+            D2: {
+                name: "Web Application Security",
+                difficulty: "medium",
+                objective: "Find and exploit a SQL injection vulnerability in the web application.",
+                description: "This challenge involves identifying and exploiting SQL injection flaws in web applications to extract sensitive data.",
+                hints: [
+                    "Look for input fields that interact with databases",
+                    "Try common SQL injection payloads",
+                    "Use tools like sqlmap for automated testing"
+                ],
+                terminal: "$ sqlmap -u 'http://target.ctf.local/login.php' --data='username=admin&password=test'\n[INFO] testing connection to the target URL\n[INFO] checking if the target is protected by some kind of WAF/IPS"
+            },
+            D3: {
+                name: "Cryptographic Analysis",
+                difficulty: "hard",
+                objective: "Decrypt the encrypted message using cryptanalysis techniques.",
+                description: "This challenge requires you to analyze and break a cryptographic cipher to reveal the hidden message.",
+                hints: [
+                    "Analyze the frequency of characters",
+                    "Consider classical cipher techniques",
+                    "Look for patterns in the ciphertext"
+                ],
+                terminal: "$ python3 crypto_analyzer.py encrypted.txt\nAnalyzing cipher patterns...\nFrequency analysis:\nE: 12.7%, T: 9.1%, A: 8.2%"
+            },
+            D4: {
+                name: "Binary Exploitation",
+                difficulty: "hard",
+                objective: "Exploit a buffer overflow vulnerability to gain shell access.",
+                description: "This challenge involves finding and exploiting memory corruption vulnerabilities in binary executables.",
+                hints: [
+                    "Analyze the binary with tools like GDB",
+                    "Look for buffer overflow opportunities",
+                    "Craft a payload to control the return address"
+                ],
+                terminal: "$ gdb ./vulnerable_binary\n(gdb) run AAAAAAAAAAAAAAAAAAAA\nProgram received signal SIGSEGV, Segmentation fault."
+            },
+            D5: {
+                name: "Digital Forensics",
+                difficulty: "medium",
+                objective: "Analyze the disk image to find hidden evidence of malicious activity.",
+                description: "This challenge involves digital forensics techniques to recover and analyze digital evidence from compromised systems.",
+                hints: [
+                    "Use forensic tools like Autopsy or Sleuth Kit",
+                    "Look for deleted files and hidden partitions",
+                    "Analyze system logs and registry entries"
+                ],
+                terminal: "$ fls -r disk_image.dd\nd/d 11: lost+found\nr/r 12: suspicious_file.txt (deleted)\nr/r 13: system.log"
+            },
+            D6: {
+                name: "Wireless Security",
+                difficulty: "medium",
+                objective: "Crack the WPA2 password of the target wireless network.",
+                description: "This challenge focuses on wireless network security assessment and password cracking techniques.",
+                hints: [
+                    "Capture the 4-way handshake",
+                    "Use dictionary attacks with tools like hashcat",
+                    "Consider common password patterns"
+                ],
+                terminal: "$ aircrack-ng -w rockyou.txt capture.cap\nReading packets, please wait...\nAttempting to crack WPA2 passphrase..."
+            },
+            D7: {
+                name: "Reverse Engineering",
+                difficulty: "hard",
+                objective: "Reverse engineer the binary to find the correct license key algorithm.",
+                description: "This challenge requires you to analyze and understand the inner workings of a compiled program to extract the key generation algorithm.",
+                hints: [
+                    "Use disassemblers like IDA Pro or Ghidra",
+                    "Analyze the key validation routine",
+                    "Look for mathematical operations and constants"
+                ],
+                terminal: "$ strings license_checker | grep -i key\nInvalid license key format\nKey validation successful\nMAGIC_CONSTANT_0x1337"
+            },
+            D8: {
+                name: "Social Engineering",
+                difficulty: "easy",
+                objective: "Use OSINT techniques to gather information about the target organization.",
+                description: "This challenge involves open-source intelligence gathering and social engineering reconnaissance techniques.",
+                hints: [
+                    "Search social media profiles and company websites",
+                    "Use tools like theHarvester and Maltego",
+                    "Look for employee information and organizational structure"
+                ],
+                terminal: "$ theHarvester -d target-company.com -b google\n[*] Searching Google for emails...\njohn.doe@target-company.com\nhr@target-company.com"
+            },
+            D9: {
+                name: "Steganography",
+                difficulty: "medium",
+                objective: "Extract the hidden message from the provided image file.",
+                description: "This challenge involves discovering and extracting hidden information concealed within digital media files.",
+                hints: [
+                    "Use tools like steghide or zsteg",
+                    "Check file metadata and headers",
+                    "Look for LSB steganography techniques"
+                ],
+                terminal: "$ steghide extract -sf hidden_message.jpg\nEnter passphrase: [blank]\nwrote extracted data to 'secret.txt'"
+            },
+            D10: {
+                name: "Privilege Escalation",
+                difficulty: "hard",
+                objective: "Escalate your privileges from a standard user to root access.",
+                description: "This challenge focuses on identifying and exploiting privilege escalation vulnerabilities in Linux systems.",
+                hints: [
+                    "Check for SUID binaries and sudo permissions",
+                    "Look for kernel exploits and misconfigurations",
+                    "Analyze cron jobs and system services"
+                ],
+                terminal: "$ find / -perm -4000 2>/dev/null\n/usr/bin/passwd\n/usr/bin/sudo\n/opt/vulnerable_suid_binary"
+            },
+            D11: {
+                name: "Web API Security",
+                difficulty: "medium",
+                objective: "Exploit authentication bypass in the REST API to access admin endpoints.",
+                description: "This challenge involves testing and exploiting security vulnerabilities in web APIs and authentication mechanisms.",
+                hints: [
+                    "Test for JWT token manipulation",
+                    "Look for parameter tampering opportunities",
+                    "Check for insecure direct object references"
+                ],
+                terminal: "$ curl -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...' https://api.target.ctf/admin/users\n{\"error\": \"Invalid token signature\"}"
+            },
+            D12: {
+                name: "Advanced Persistence",
+                difficulty: "hard",
+                objective: "Analyze the malware sample and identify its persistence mechanisms.",
+                description: "This challenge involves advanced malware analysis and understanding sophisticated persistence techniques used by APT groups.",
+                hints: [
+                    "Use dynamic analysis tools like Cuckoo Sandbox",
+                    "Analyze registry modifications and file system changes",
+                    "Look for network communication patterns"
+                ],
+                terminal: "$ volatility -f memory.dump --profile=Win7SP1x64 pslist\nPID   PPID  Name\n1337  484   suspicious_process.exe\n2048  1337  injected_payload.dll"
+            }
+        };
+
+        function getUrlParameter(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        function loadChallenge() {
+            const challengeId = getUrlParameter('id') || 'D1';
+            const challenge = challengeData[challengeId];
+
+            if (!challenge) {
+                document.getElementById('challengeName').textContent = 'Challenge Not Found';
+                document.getElementById('challengeContent').innerHTML = '<p>Invalid challenge ID</p>';
+                return;
+            }
+
+            document.getElementById('challengeId').textContent = challengeId;
+            document.getElementById('challengeName').textContent = challenge.name;
+            document.title = `CTF Challenge ${challengeId} - ${challenge.name}`;
+
+            const difficultyClass = `difficulty-${challenge.difficulty}`;
+            const content = `
+                <div class="challenge-card">
+                    <div class="card-title">
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4"></path>
+                            <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
+                            <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>
+                            <path d="M3 12h6m6 0h6"></path>
+                        </svg>
+                        Objective
+                    </div>
+                    <div class="card-content">
+                        ${challenge.objective}
+                        <div class="difficulty-badge ${difficultyClass}">
+                            ${challenge.difficulty.toUpperCase()}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="card-title">
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14,2 14,8 20,8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10,9 9,9 8,9"></polyline>
+                        </svg>
+                        Description
+                    </div>
+                    <div class="card-content">
+                        ${challenge.description}
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="card-title">
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        Hints
+                    </div>
+                    <div class="card-content">
+                        <ul class="hint-list">
+                            ${challenge.hints.map(hint => `<li>${hint}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="card-title">
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="4,17 10,11 4,5"></polyline>
+                            <line x1="12" y1="19" x2="20" y2="19"></line>
+                        </svg>
+                        Example Usage
+                    </div>
+                    <div class="card-content">
+                        Example commands and output for this challenge:
+                        <div class="terminal-output">
+                            <span class="terminal-prompt">cyber@ctf:~$</span> ${challenge.terminal.replace(/\n/g, '<br><span class="terminal-prompt">cyber@ctf:~$</span> ')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('challengeContent').innerHTML = content;
+        }
+
+        // Load challenge when page loads
+        document.addEventListener('DOMContentLoaded', loadChallenge);
+    </script>
+</body>
+</html>
